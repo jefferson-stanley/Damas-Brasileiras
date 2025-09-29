@@ -1,9 +1,8 @@
 from todas_funcoes import *
 
-
 def main():
     tabuleiro = [[0, -1,  0, -1,  0, -1,  0, -1],
-                 [-1,  0, -1,  0, -1,  0, -1,  0],
+                 [-1,  0, -1,  0, -1,  0, -1, 0],
                  [0, -1,  0, -1,  0, -1,  0, -1],
                  [0,  0,  0,  0,  0,  0,  0,  0],
                  [0,  0,  0,  0,  0,  0,  0,  0],
@@ -67,6 +66,16 @@ def main():
 
         if movimentos_válidos[destino[0]][destino[1]] == 1:
             efetua_jogada(tabuleiro, origem, destino)
+            
+            cont = 0
+            for elem in tabuleiro:
+                for num in elem:
+                    if num * -jogador > 0:
+                        cont += 1
+            if cont == 0:
+                print(f'Fim de Jogo! O Jogador {1 if jogador == 1 else 2} venceu!')
+                fim_de_jogo = True
+
 
         else:
             print('Jogada Inválida! Tente novamente!\n')
@@ -79,13 +88,12 @@ def main():
             if teve_captura:
                 origem_temporaria = destino
                 if existem_capturas_da_posicao(tabuleiro, jogador, origem_temporaria):
-                    print(
-                        'Você ainda tem captura(s)! Porém, para essa(s) você precisa apenas informar para onde quer mover a peça.\n')
+                    print('\nVocê ainda tem captura(s)! Porém, para essa(s) você precisa apenas informar para onde quer mover a peça.\n')
 
-                    movimentos_válidos = move(
-                        tabuleiro, jogador, origem_temporaria)
+                    movimentos_válidos = move(tabuleiro, jogador, origem_temporaria)
 
                     novo_tab = copia_tabuleiro(tabuleiro)
+
                     for i in range(len(movimentos_válidos)):
                         for j in range(len(movimentos_válidos[i])):
                             if movimentos_válidos[i][j] == 1:
@@ -95,20 +103,18 @@ def main():
 
                     printa_tab(novo_tab)
 
-                    destino_captura = input(
-                        'Selecione para onde quer mover a peça: ').upper()
+                    destino_captura = input('Selecione para onde quer mover a peça: ').upper()
 
                     if len(destino_captura) != 2:
-                        print('Entrada inválida! Tente Novamente!')
+                        print('Entrada inválida! Tente Novamente!\n')
                         continue
 
                     if not destino_captura[0] in linhas.keys() or not destino_captura[1] in colunas.keys():
-                        print(
-                            'As coordenadas que você forneceu são inválidas! Tente Novamente!\n')
+                        print('As coordenadas que você forneceu são inválidas! Tente Novamente\n')
+
                         continue
 
-                    destino = linhas[destino_captura[0]
-                                     ], colunas[destino_captura[1]]
+                    destino = linhas[destino_captura[0]], colunas[destino_captura[1]]
 
                     if movimentos_válidos[destino[0]][destino[1]] == 1:
                         efetua_jogada(tabuleiro, origem_temporaria, destino)
@@ -116,30 +122,18 @@ def main():
                         cont = 0
                         for elem in tabuleiro:
                             for num in elem:
-                                if num * jogador > 0:
+                                if num * -jogador > 0:
                                     cont += 1
                         if cont == 0:
-                            print(
-                                f'Fim de Jogo! O Jogador {2 if jogador == 1 else 1} venceu!')
+                            print(f'Fim de Jogo! O Jogador {1 if jogador == 1 else 2} venceu!')
 
                             fim_de_jogo = True
-
-                        cont = 0
-                        for elem in tabuleiro:
-                            for num in elem:
-                                if num * jogador > 0:
-                                    cont += 1
-                        if cont == 0:
-                            print(
-                                f'\nFim de Jogo! O Jogador {2 if jogador == 1 else 1} venceu!')
-                            fim_de_jogo = True
-
-                        jogador *= -1
 
                 else:
                     break
             else:
                 break
+
         jogador *= -1
 
 
