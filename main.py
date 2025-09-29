@@ -80,7 +80,7 @@ def main():
                 origem_temporaria = destino
                 if existem_capturas_da_posicao(tabuleiro, jogador, origem_temporaria):
                     print(
-                        'Você ainda tem captura(s)! Porém, para essa(s) você precisa apenas informar para onde quer mover a peça.')
+                        'Você ainda tem captura(s)! Porém, para essa(s) você precisa apenas informar para onde quer mover a peça.\n')
 
                     movimentos_válidos = move(
                         tabuleiro, jogador, origem_temporaria)
@@ -91,7 +91,7 @@ def main():
                             if movimentos_válidos[i][j] == 1:
                                 novo_tab[i][j] = 3
 
-                    print('Para essa peça, você pode realizar esses movimentos:')
+                    print('Para essa peça, você pode realizar esses movimentos:\n')
 
                     printa_tab(novo_tab)
 
@@ -104,7 +104,7 @@ def main():
 
                     if not destino_captura[0] in linhas.keys() or not destino_captura[1] in colunas.keys():
                         print(
-                            'As coordenadas que você forneceu são inválidas! Tente Novamente')
+                            'As coordenadas que você forneceu são inválidas! Tente Novamente!\n')
                         continue
 
                     destino = linhas[destino_captura[0]
@@ -124,8 +124,6 @@ def main():
 
                             fim_de_jogo = True
 
-                        jogador *= -1
-
                         cont = 0
                         for elem in tabuleiro:
                             for num in elem:
@@ -133,7 +131,7 @@ def main():
                                     cont += 1
                         if cont == 0:
                             print(
-                                f'Fim de Jogo! O Jogador {2 if jogador == 1 else 1} venceu!')
+                                f'\nFim de Jogo! O Jogador {2 if jogador == 1 else 1} venceu!')
                             fim_de_jogo = True
 
                         jogador *= -1
@@ -142,6 +140,7 @@ def main():
                     break
             else:
                 break
+        jogador *= -1
 
 
 main()
