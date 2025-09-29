@@ -176,39 +176,39 @@ def existem_capturas_da_posicao(tabuleiro, jogador, origem):
 
 def captura(tabuleiro, pos, dx, dy):
     """Verifica se a captura é possível a partir de pos na direção dx,dy"""
+    n = len(tabuleiro)
     x = pos[0] + 2 * dx
     y = pos[1] + 2 * dy
-    if 0 <= x <= 7 and 0 <= y <= 7:
-        if tabuleiro[x][y] == 0:  # casa depois do inimigo está livre
-            return True
-    return False
+    return 0 <= x < n and 0 <= y < n and tabuleiro[x][y] == 0
 
 
 def move(tabuleiro, player, pos):
     n = len(tabuleiro)
     peca = tabuleiro[pos[0]][pos[1]]
 
-    if abs(peca) == 1:  # peão
-        direcoes = [(-1, -1), (-1, 1)] if player == 1 else [(1, -1), (1, 1)]
-    else:  # dama
-        direcoes = [(-1, -1), (-1, 1), (1, -1), (1, 1)]
+    # Direções de movimento simples do peão (só pra frente)
+    dir_move_peao = [(-1, -1), (-1, 1)] if player == 1 else [(1, -1), (1, 1)]
+    # Direções de captura do peão (pra frente e pra trás)
+    dir_captura_peao = [(-1, -1), (-1, 1), (1, -1), (1, 1)]
+    # Direções da dama (todas)
+    dir_dama = [(-1, -1), (-1, 1), (1, -1), (1, 1)]
 
+    # --- varre o tabuleiro p/ achar peças com captura obrigatória ---
     obrigatorias = []
     for i in range(n):
         for j in range(n):
             p = tabuleiro[i][j]
             if p * player > 0:
-                if abs(p) == 1:
-                    dirs = [(-1, -1), (-1, 1)
-                            ] if player == 1 else [(1, -1), (1, 1)]
-                    for dx, dy in dirs:
+                if abs(p) == 1:  # peão: capturas em 4 diagonais
+                    for dx, dy in dir_captura_peao:
                         x1, y1 = i + dx, j + dy
                         x2, y2 = i + 2*dx, j + 2*dy
-                        if 0 <= x2 < n and 0 <= y2 < n:
+                        if 0 <= x2 < n and 0 <= y2 < n and 0 <= x1 < n and 0 <= y1 < n:
                             if tabuleiro[x1][y1] * player < 0 and tabuleiro[x2][y2] == 0:
                                 obrigatorias.append((i, j))
+                                break  # já sabemos que esta peça tem captura
                 else:  # dama
-                    for dx, dy in direcoes:
+                    for dx, dy in dir_dama:
                         x, y = i + dx, j + dy
                         encontrou = False
                         while 0 <= x < n and 0 <= y < n:
@@ -228,19 +228,26 @@ def move(tabuleiro, player, pos):
 
     moves = [[0]*n for _ in range(n)]
 
+    # Se há captura obrigatória e a peça selecionada não está na lista, não pode mover
     if obrigatorias and pos not in obrigatorias:
-        print('Você tem uma captura obrigatória!')
         return moves
+
     if abs(peca) == 1:
-        for dx, dy in direcoes:
-            x, y = pos[0] + dx, pos[1] + dy
-            if 0 <= x < n and 0 <= y < n:
-                if tabuleiro[x][y] == 0 and not obrigatorias:
+        # movimentos simples (só pra frente) — apenas se não houver obrigatórias
+        if not obrigatorias:
+            for dx, dy in dir_move_peao:
+                x, y = pos[0] + dx, pos[1] + dy
+                if 0 <= x < n and 0 <= y < n and tabuleiro[x][y] == 0:
                     moves[x][y] = 1
-                elif tabuleiro[x][y] * player < 0 and captura(tabuleiro, pos, dx, dy):
+
+        for dx, dy in dir_captura_peao:
+            x1, y1 = pos[0] + dx, pos[1] + dy
+            if 0 <= x1 < n and 0 <= y1 < n and tabuleiro[x1][y1] * player < 0:
+                if captura(tabuleiro, pos, dx, dy):
                     moves[pos[0] + 2*dx][pos[1] + 2*dy] = 1
-    else:  # dama
-        for dx, dy in direcoes:
+
+    else:
+        for dx, dy in dir_dama:
             x, y = pos[0] + dx, pos[1] + dy
             encontrou = False
             while 0 <= x < n and 0 <= y < n:
@@ -265,7 +272,7 @@ def move(tabuleiro, player, pos):
 def contar_pecas(tabuleiro):
     """Retorna a quantidade total de peças no tabuleiro (peões + damas de ambos os jogadores)."""
     count = 0
-    
+
     for linha in tabuleiro:
         for casa in linha:
             if casa != 0:
