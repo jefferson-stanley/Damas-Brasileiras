@@ -19,7 +19,7 @@ def main():
     fim_de_jogo = False
 
     while not fim_de_jogo:
-        print(f'        Vez do Jogador {2 if jogador == -1 else 1}!\n')
+        print(f'\n        Vez do Jogador {2 if jogador == -1 else 1}!\n')
 
         printa_tab(tabuleiro)
 
