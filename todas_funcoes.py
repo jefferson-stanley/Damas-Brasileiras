@@ -110,8 +110,6 @@ def existem_capturas_da_posicao(tabuleiro, jogador, origem):
     """
     Verifica se existe PELO MENOS UMA captura possível a partir de
     uma posição de origem específica. Retorna True ou False.
-
-    origem: uma tupla de coordenadas (linha, coluna). Ex: (4, 3)
     """
     # 1. Desempacota as coordenadas de origem para usá-las.
     i, j = origem
@@ -138,39 +136,35 @@ def existem_capturas_da_posicao(tabuleiro, jogador, origem):
                 peca_inimiga = tabuleiro[x_aresta][y_aresta]
                 casa_de_pouso = tabuleiro[x_pouso][y_pouso]
 
-                # Se encontrar uma única captura, já pode retornar True.
+                # Se encontrar uma única captura, retorna True.
                 if peca_inimiga * jogador < 0 and casa_de_pouso == 0:
                     return True
-
-    # --- LÓGICA PARA DAMA ---
-    # Esta lógica também é a sua, focada apenas na origem.
+                    
     elif abs(peca) == 2:
         for dx, dy in direcoes:
             encontrou_inimigo = False
-            # O laço 'k' simula o "deslize" da Dama
+            
             for k in range(1, n):
                 x_passo = i + k * dx
                 y_passo = j + k * dy
 
                 if not (0 <= x_passo < n and 0 <= y_passo < n):
-                    break  # Saiu do tabuleiro, para de olhar nesta direção
+                    break  
 
                 peca_no_caminho = tabuleiro[x_passo][y_passo]
 
                 if encontrou_inimigo:
-                    # Se já pulou um inimigo, a próxima casa tem que ser vazia
+                    
                     if peca_no_caminho == 0:
-                        return True  # Encontrou um pouso válido, é uma captura!
+                        return True  
                     else:
-                        break  # Caminho bloqueado, para de olhar nesta direção
+                        break  
                 else:
-                    if peca_no_caminho * jogador > 0:  # Peça amiga
+                    if peca_no_caminho * jogador > 0:  
                         break
-                    elif peca_no_caminho * jogador < 0:  # Peça inimiga
+                    elif peca_no_caminho * jogador < 0:  
                         encontrou_inimigo = True
-
-    # 4. Se a função percorreu todas as direções e não retornou True,
-    #    significa que não há capturas a partir desta origem.
+                        
     return False
 
 
@@ -193,20 +187,19 @@ def move(tabuleiro, player, pos):
     # Direções da dama (todas)
     dir_dama = [(-1, -1), (-1, 1), (1, -1), (1, 1)]
 
-    # --- varre o tabuleiro p/ achar peças com captura obrigatória ---
     obrigatorias = []
     for i in range(n):
         for j in range(n):
             p = tabuleiro[i][j]
             if p * player > 0:
-                if abs(p) == 1:  # peão: capturas em 4 diagonais
+                if abs(p) == 1:  
                     for dx, dy in dir_captura_peao:
                         x1, y1 = i + dx, j + dy
                         x2, y2 = i + 2*dx, j + 2*dy
                         if 0 <= x2 < n and 0 <= y2 < n and 0 <= x1 < n and 0 <= y1 < n:
                             if tabuleiro[x1][y1] * player < 0 and tabuleiro[x2][y2] == 0:
                                 obrigatorias.append((i, j))
-                                break  # já sabemos que esta peça tem captura
+                                break  
                 else:  # dama
                     for dx, dy in dir_dama:
                         x, y = i + dx, j + dy
@@ -228,12 +221,10 @@ def move(tabuleiro, player, pos):
 
     moves = [[0]*n for _ in range(n)]
 
-    # Se há captura obrigatória e a peça selecionada não está na lista, não pode mover
     if obrigatorias and pos not in obrigatorias:
         return moves
 
     if abs(peca) == 1:
-        # movimentos simples (só pra frente) — apenas se não houver obrigatórias
         if not obrigatorias:
             for dx, dy in dir_move_peao:
                 x, y = pos[0] + dx, pos[1] + dy
@@ -288,9 +279,6 @@ def efetua_jogada(tabuleiro, origem, destino):
     peca = tabuleiro[i][j]
     tabuleiro[i][j] = 0
     tabuleiro[x][y] = peca
-
-    # Captura (peão)
-    # Se tiver captura de peão, a aresta recebe 0
 
     if abs(peca) == 1 and abs(i - x) == 2:
         x_aresta = (i + x) // 2
